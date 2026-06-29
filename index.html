@@ -65,6 +65,25 @@
             color: #333;
         }
 
+        .level-board {
+            background: linear-gradient(135deg, #edc22e 0%, #f59563 100%);
+        }
+
+        .level-board .score-label,
+        .level-board .level-goal-label {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .level-board .score-value {
+            color: #fff;
+        }
+
+        .score-goal {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+        }
+
         .btn {
             background: white;
             border: none;
@@ -258,6 +277,16 @@
                     <div class="score-value" id="best">0</div>
                 </div>
             </div>
+            <div class="score-board level-board">
+                <div class="score-item">
+                    <div class="score-label">Level</div>
+                    <div class="score-value" id="level">1</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label level-goal-label">Goal</div>
+                    <div class="score-goal" id="levelGoal">2048</div>
+                </div>
+            </div>
             <button class="btn" onclick="game.newGame()">New Game</button>
         </div>
         <div class="game-board" id="gameBoard">
@@ -270,7 +299,8 @@
             <h2 id="gameOverTitle">Game Over!</h2>
             <p id="gameOverMessage"></p>
             <div class="final-score" id="finalScore"></div>
-            <button class="btn" onclick="game.newGame()">Play Again</button>
+            <button class="btn" id="continueBtn" onclick="game.nextLevel()" style="display:none;">Next Level →</button>
+            <button class="btn" id="playAgainBtn" onclick="game.newGame()">Play Again</button>
         </div>
     </div>
 
@@ -282,8 +312,13 @@
                 this.score = 0;
                 this.best = localStorage.getItem('2048-best') || 0;
                 this.gameOver = false;
-                this.won = false;
                 this.tiles = new Map();
+
+                // Level progression: each level asks for a higher target tile.
+                this.targets = [2048, 4096, 8192, 16384, 32768, 65536];
+                this.level = 1;
+                this.target = this.targets[0];
+                this.levelReached = false;
 
                 this.newGame();
                 this.setupControls();
@@ -294,7 +329,9 @@
                 this.board = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(0));
                 this.score = 0;
                 this.gameOver = false;
-                this.won = false;
+                this.level = 1;
+                this.target = this.targets[0];
+                this.levelReached = false;
                 this.tiles.clear();
 
                 this.addNewTile();
@@ -445,8 +482,8 @@
                         this.score += arr[i];
                         arr[i + 1] = 0;
 
-                        if (arr[i] === 2048 && !this.won) {
-                            this.won = true;
+                        if (arr[i] >= this.target) {
+                            this.levelReached = true;
                         }
                     }
                 }
@@ -466,34 +503,66 @@
             }
 
             checkGameState() {
-                if (this.won) {
-                    this.endGame(true);
+                if (this.levelReached) {
+                    this.completeLevel();
                 } else if (!this.canMove()) {
-                    this.endGame(false);
+                    this.endGame();
                 }
             }
 
-            endGame(won) {
+            saveBest() {
+                if (this.score > this.best) {
+                    this.best = this.score;
+                    localStorage.setItem('2048-best', this.best);
+                    this.updateDisplay();
+                }
+            }
+
+            completeLevel() {
                 this.gameOver = true;
+                this.saveBest();
+
                 const screen = document.getElementById('gameOverScreen');
                 const title = document.getElementById('gameOverTitle');
                 const message = document.getElementById('gameOverMessage');
                 const finalScore = document.getElementById('finalScore');
+                const isFinalLevel = this.level >= this.targets.length;
 
-                if (won) {
-                    title.textContent = '🎉 You Won!';
-                    message.textContent = 'You reached 2048!';
+                if (isFinalLevel) {
+                    title.textContent = '🏆 Champion!';
+                    message.textContent = `You cleared every level and reached ${this.target}!`;
+                    document.getElementById('continueBtn').style.display = 'none';
                 } else {
-                    title.textContent = 'Game Over';
-                    message.textContent = 'No more moves available.';
+                    title.textContent = `✨ Level ${this.level} Cleared!`;
+                    message.textContent = `You reached ${this.target}. Next goal: ${this.targets[this.level]}.`;
+                    document.getElementById('continueBtn').style.display = 'inline-block';
                 }
                 finalScore.textContent = `Score: ${this.score}`;
                 screen.classList.add('show');
+            }
 
-                if (this.score > this.best) {
-                    this.best = this.score;
-                    localStorage.setItem('2048-best', this.best);
-                }
+            nextLevel() {
+                // Advance the goal but keep the board so progress carries over.
+                this.level++;
+                this.target = this.targets[Math.min(this.level - 1, this.targets.length - 1)];
+                this.levelReached = false;
+                this.gameOver = false;
+                document.getElementById('gameOverScreen').classList.remove('show');
+                document.getElementById('continueBtn').style.display = 'none';
+                this.updateDisplay();
+            }
+
+            endGame() {
+                this.gameOver = true;
+                this.saveBest();
+
+                const screen = document.getElementById('gameOverScreen');
+                document.getElementById('gameOverTitle').textContent = 'Game Over';
+                document.getElementById('gameOverMessage').textContent =
+                    `No more moves on level ${this.level}.`;
+                document.getElementById('finalScore').textContent = `Score: ${this.score}`;
+                document.getElementById('continueBtn').style.display = 'none';
+                screen.classList.add('show');
             }
 
             render() {
@@ -538,6 +607,8 @@
             updateDisplay() {
                 document.getElementById('score').textContent = this.score;
                 document.getElementById('best').textContent = this.best;
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('levelGoal').textContent = this.target;
             }
         }
 
