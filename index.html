@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2048</title>
-    <style>
         * {
             margin: 0;
             padding: 0;
@@ -14,26 +13,13 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
             justify-content: center;
-            align-items: center;
             min-height: 100vh;
             padding: 20px;
-        }
-
-        .container {
-            text-align: center;
-        }
-
-        h1 {
             color: white;
             margin-bottom: 10px;
             font-size: 3em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .header {
-            display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
@@ -55,7 +41,6 @@
         .score-label {
             font-size: 0.9em;
             color: #999;
-            text-transform: uppercase;
             letter-spacing: 1px;
         }
 
@@ -72,8 +57,6 @@
         .level-board .score-label,
         .level-board .level-goal-label {
             color: rgba(255, 255, 255, 0.85);
-        }
-
         .level-board .score-value {
             color: #fff;
         }
@@ -86,12 +69,10 @@
 
         .btn {
             background: white;
-            border: none;
             padding: 12px 30px;
             border-radius: 10px;
             font-size: 1em;
             font-weight: bold;
-            cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             color: #667eea;
@@ -104,9 +85,6 @@
 
         .btn:active {
             transform: translateY(0);
-        }
-
-        .game-board {
             background: #bbada0;
             border-radius: 10px;
             padding: 10px;
@@ -168,8 +146,6 @@
             100% {
                 transform: scale(1);
             }
-        }
-
         /* Tile colors */
         .tile-2 { background: #eee4da; color: #776e65; }
         .tile-4 { background: #ede0c8; color: #776e65; }
@@ -184,9 +160,6 @@
         .tile-2048 { background: #edc22e; color: #f9f6f2; font-size: 1.5em; }
         .tile-4096 { background: #3c3a2f; color: #f9f6f2; font-size: 1.5em; }
         .tile-8192 { background: #3c3a2f; color: #f9f6f2; font-size: 1.5em; }
-
-        .game-over {
-            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -206,7 +179,6 @@
             background: white;
             padding: 40px;
             border-radius: 15px;
-            text-align: center;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
@@ -220,24 +192,15 @@
             font-size: 1.2em;
             color: #666;
             margin-bottom: 10px;
-        }
-
         .game-over-content .final-score {
             font-size: 2em;
             font-weight: bold;
             color: #667eea;
             margin: 20px 0;
-        }
-
         .game-over-content button {
             margin-top: 20px;
-        }
-
         @media (max-width: 480px) {
-            h1 {
                 font-size: 2em;
-            }
-
             .game-board {
                 width: 100%;
                 height: auto;
@@ -248,36 +211,24 @@
                 width: 22%;
                 height: 22%;
                 font-size: 1.5em;
-            }
-
             .header {
                 flex-direction: column;
                 width: 100%;
             }
-
-            .score-board {
                 width: 100%;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>2048</h1>
-        <div class="header">
-            <div class="score-board">
                 <div class="score-item">
                     <div class="score-label">Score</div>
                     <div class="score-value" id="score">0</div>
                 </div>
-            </div>
-            <div class="score-board">
                 <div class="score-item">
                     <div class="score-label">Best</div>
                     <div class="score-value" id="best">0</div>
                 </div>
-            </div>
-            <div class="score-board level-board">
                 <div class="score-item">
                     <div class="score-label">Level</div>
                     <div class="score-value" id="level">1</div>
@@ -289,16 +240,12 @@
             </div>
             <button class="btn" onclick="game.newGame()">New Game</button>
         </div>
-        <div class="game-board" id="gameBoard">
             <!-- Tiles will be generated here -->
-        </div>
     </div>
 
     <div class="game-over" id="gameOverScreen">
         <div class="game-over-content">
             <h2 id="gameOverTitle">Game Over!</h2>
-            <p id="gameOverMessage"></p>
-            <div class="final-score" id="finalScore"></div>
             <button class="btn" id="continueBtn" onclick="game.nextLevel()" style="display:none;">Next Level →</button>
             <button class="btn" id="playAgainBtn" onclick="game.newGame()">Play Again</button>
         </div>
@@ -345,12 +292,9 @@
                 document.addEventListener('keydown', (e) => {
                     if (this.gameOver) return;
 
-                    const moves = {
                         'ArrowLeft': () => this.move('left'),
-                        'ArrowRight': () => this.move('right'),
                         'ArrowUp': () => this.move('up'),
                         'ArrowDown': () => this.move('down'),
-                    };
 
                     if (moves[e.key]) {
                         e.preventDefault();
@@ -375,7 +319,6 @@
 
                     const diffX = touchEndX - touchStartX;
                     const diffY = touchEndY - touchStartY;
-                    const threshold = 50;
 
                     if (Math.abs(diffX) > Math.abs(diffY)) {
                         if (diffX > threshold) this.move('right');
@@ -391,7 +334,6 @@
                 const empty = [];
                 for (let i = 0; i < this.gridSize; i++) {
                     for (let j = 0; j < this.gridSize; j++) {
-                        if (this.board[i][j] === 0) empty.push([i, j]);
                     }
                 }
 
@@ -405,7 +347,6 @@
                 const oldBoard = this.board.map(row => [...row]);
 
                 if (direction === 'left') this.moveLeft();
-                else if (direction === 'right') this.moveRight();
                 else if (direction === 'up') this.moveUp();
                 else if (direction === 'down') this.moveDown();
 
@@ -495,7 +436,6 @@
                 for (let i = 0; i < this.gridSize; i++) {
                     for (let j = 0; j < this.gridSize - 1; j++) {
                         if (this.board[i][j] === 0 || this.board[i][j] === this.board[i][j + 1]) {
-                            return true;
                         }
                     }
                 }
@@ -523,20 +463,14 @@
                 this.saveBest();
 
                 const screen = document.getElementById('gameOverScreen');
-                const title = document.getElementById('gameOverTitle');
-                const message = document.getElementById('gameOverMessage');
                 const finalScore = document.getElementById('finalScore');
                 const isFinalLevel = this.level >= this.targets.length;
 
-                if (isFinalLevel) {
                     title.textContent = '🏆 Champion!';
                     message.textContent = `You cleared every level and reached ${this.target}!`;
                     document.getElementById('continueBtn').style.display = 'none';
-                } else {
                     title.textContent = `✨ Level ${this.level} Cleared!`;
-                    message.textContent = `You reached ${this.target}. Next goal: ${this.targets[this.level]}.`;
                     document.getElementById('continueBtn').style.display = 'inline-block';
-                }
                 finalScore.textContent = `Score: ${this.score}`;
                 screen.classList.add('show');
             }
@@ -557,11 +491,8 @@
                 this.saveBest();
 
                 const screen = document.getElementById('gameOverScreen');
-                document.getElementById('gameOverTitle').textContent = 'Game Over';
                 document.getElementById('gameOverMessage').textContent =
                     `No more moves on level ${this.level}.`;
-                document.getElementById('finalScore').textContent = `Score: ${this.score}`;
-                document.getElementById('continueBtn').style.display = 'none';
                 screen.classList.add('show');
             }
 
@@ -584,8 +515,6 @@
                             tile.style.height = '100%';
                             tile.style.top = '0';
                             tile.style.left = '0';
-                            container.appendChild(tile);
-                        }
 
                         board.appendChild(container);
                     }
